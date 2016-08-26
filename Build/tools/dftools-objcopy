@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+if [ "$#" != 4 ]; then
+	echo "objcopy: wrong number of arguments" >&2
+	exit 1
+fi
+if [ "$1" != --output-target ]; then
+	echo "objcopy: unrecognized option '$1'" >&2
+	exit 1
+fi
+if [ "$2" != binary ]; then
+	echo "objcopy: unrecognized output format '$2'" >&2
+	exit 1
+fi
+exec s19tobin -r <"$3" >"$4"

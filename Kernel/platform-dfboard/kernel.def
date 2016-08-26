@@ -1,0 +1,10 @@
+/* FUZIX mnemonics for memory addresses etc */
+#define U_DATA                    ($F800)      /* (this is struct u_data from kernel.h) */
+#define U_DATA__TOTALSIZE         ($0200)      /* 256+256 */
+#define PROGBASE                  ($8000)      /* programs and data start here */
+
+/* Have these defined so that lowlevel-6809.s can be used as-is */
+#define SAM_USER
+#define SAM_KERNEL
+#define SAM_SAVE
+#define SAM_RESTORE

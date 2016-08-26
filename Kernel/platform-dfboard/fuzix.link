@@ -1,0 +1,12 @@
+section .istack load 0x0000
+section .text load 0x0100
+section .text2
+section .bss
+section .data
+section .common
+section .text3
+section .endofkernel
+section .discard load 0x9000
+section .udata load 0xF800
+section .vectors load 0xFFF0
+entry start

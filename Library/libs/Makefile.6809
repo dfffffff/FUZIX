@@ -1,6 +1,7 @@
 CC = m6809-unknown-gcc
 ASM = m6809-unknown-as
 AR = m6809-unknown-ar
+RANLIB = m6809-unknown-ranlib
 PLATFORM = 6809
 export PLATFORM
 CC_OPT = -c -Os -I../include -I../include/6809
@@ -13,7 +14,7 @@ KRN_HEADERS_SRC = $(addprefix ../../Kernel/include/,$(KRN_HEADERS))
 KRN_HEADERS_COPY = $(addprefix ../include/sys/,$(KRN_HEADERS))
 SRC_CRT0 = crt0_$(PLATFORM).s crt0nostdio_$(PLATFORM).s
 OBJ_CRT0 = $(SRC_CRT0:.s=.o)
-SRC_ASM = setjmp_6809.s ashlsi3_6809.s
+SRC_ASM = setjmp_6809.s #ashlsi3_6809.s
 OBJ_ASM = $(SRC_ASM:.s=.o)
 SRC_C =  __argv.c abort.c asctime.c assert.c atexit.c
 SRC_C += bcmp.c bcopy.c bsearch.c bzero.c calloc.c cfree.c clock.c closedir.c
@@ -92,8 +93,9 @@ syscall.l: fuzix$(PLATFORM)/syslib.l
 
 syslib$(PLATFORM).lib: syscall.l libc.l
 	cat libc.l syscall.l >syslib.l
-	$(AR) -c syslib$(PLATFORM).lib $$(cat syslib.l)
+	$(AR) rc syslib$(PLATFORM).lib $$(cat syslib.l)
 	ln -sf syslib$(PLATFORM).lib libc$(PLATFORM).a
+	$(RANLIB) libc$(PLATFORM).a
 
 fuzix$(PLATFORM)/syslib.l: ../tools/syscall_$(PLATFORM)
 	$<
@@ -109,16 +111,19 @@ liberror.txt: ../tools/liberror
 	make -C .. tools/liberror
 
 curses$(PLATFORM).lib: $(OBJ_CURS)
-	$(AR) -c curses$(PLATFORM).lib $(OBJ_CURS)
+	$(AR) rc curses$(PLATFORM).lib $(OBJ_CURS)
 	ln -sf curses$(PLATFORM).lib libcurses$(PLATFORM).a
+	$(RANLIB) libcurses$(PLATFORM).a
 
 termcap$(PLATFORM).lib: $(OBJ_CT)
-	$(AR) -c termcap$(PLATFORM).lib $(OBJ_CT)
+	$(AR) rc termcap$(PLATFORM).lib $(OBJ_CT)
 	ln -sf termcap$(PLATFORM).lib libtermcap$(PLATFORM).a
+	$(RANLIB) libtermcap$(PLATFORM).a
 
 m$(PLATFORM).lib: $(OBJ_LM)
-	$(AR) -c m$(PLATFORM).lib $(OBJ_LM)
+	$(AR) rc m$(PLATFORM).lib $(OBJ_LM)
 	ln -sf m$(PLATFORM).lib libm$(PLATFORM).a
+	$(RANLIB) libm$(PLATFORM).a
 
 $(OBJ_ASM):%.o: %.s
 	$(ASM) $(ASM_OPT) $@ $(@:.o=.s)

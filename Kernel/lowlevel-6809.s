@@ -59,8 +59,8 @@
 	.globl istack_top
 	.globl _ssig
 
-        include "platform/kernel.def"
-        include "kernel09.def"
+#include "platform/kernel.def"
+#include "kernel09.def"
 
         .area .common
 
@@ -429,14 +429,6 @@ outnewline:
         jsr outchar
         rts
 
-outd:  ; prints D in hex.
-	pshs b
-        tfr b,a
-        jsr outcharhex
-        puls b
-        jsr outcharhex
-        rts
-
 outx:  ; prints X
 	pshs d
 	tfr x,d
@@ -449,6 +441,12 @@ outy:  ; prints Y
 	bsr outd
 	puls d,pc
 
+outd:  ; prints D in hex.
+	pshs b
+	bsr outcharhex
+	puls a
+	; FALL THROUGH
+
 ; print the byte in A as a two-character hex value
 outcharhex:
 	pshs a
@@ -456,10 +454,9 @@ outcharhex:
         lsra
         lsra
         lsra
-        jsr outnibble
+        bsr outnibble
 	puls a
-        jsr outnibble
-        rts
+	; FALL THROUGH
 
 ; print the nibble in the low four bits of A
 outnibble:
@@ -467,7 +464,7 @@ outnibble:
         cmpa #9
         ble numeral ; less than 10?
         adda #0x07 ; start at 'A' (10+7+0x30=0x41='A')
-numeral:adda #0x30 ; start at '0' (0x30='0')
+numeral: adda #0x30 ; start at '0' (0x30='0')
         jsr outchar
         rts
 
@@ -561,6 +558,8 @@ _swab:
 	exg a,b		; swap bytes over
 	exg d,x		; back into result
 	rts
+
+#if 0
 
 _ashlhi3:
 	pshs	x
@@ -681,3 +680,189 @@ _ashrhi3:
 	bra	1$
 2$:
 	puls	x,pc
+
+#else
+
+	.globl	___ashrsi3
+___ashrsi3:
+;	.stabd	68,0,469
+LFBB1:
+	pshs	y,u
+	leas	-10,s
+	leay	,x
+	ldu	16,s
+	ldx	18,s
+;	.stabd	68,0,470
+	ldd	20,s
+	bne	L2
+;	.stabd	68,0,471
+	stu	,y
+	lbra	L8
+L2:
+;	.stabd	68,0,473
+	stx	8,s
+;	.stabd	68,0,474
+	ldd	#16
+	subd	20,s	;subhi: R:d -= 20,s
+	std	,s	;movhi: R:d -> ,s w/ implied test of d
+;	.stabd	68,0,477
+	bgt	L4
+;	.stabd	68,0,480
+	tfr	u,d
+	tfr	a,b
+	sex	;extendqihi2: R:b -> R:d
+	rolb
+	rolb
+	andb	#1
+	negb
+	std	2,s
+;	.stabd	68,0,481
+	ldd	,s
+	nega
+	negb
+	sbca	#0
+	tfr	d,x
+	tfr	u,d
+	jsr	_ashrhi3
+	bra	L7
+L4:
+LBB2:
+;	.stabd	68,0,487
+	tfr	u,d
+	ldx	20,s
+	jsr	_ashrhi3
+	std	2,s
+;	.stabd	68,0,488
+	tfr	u,d
+	ldx	,s
+	jsr	_ashlhi3
+	tfr	d,u
+	ldd	8,s
+	ldx	20,s
+	jsr	_lshrhi3
+	std	,s
+	pshs	u
+	ora	,s+
+	orb	,s+
+L7:
+	std	4,s
+LBE2:
+;	.stabd	68,0,491
+	ldd	2,s
+	std	,y
+	ldx	4,s
+L8:
+	stx	2,y
+;	.stabd	68,0,492
+	leax	,y
+	leas	10,s
+	puls	y,u,pc
+
+
+	.globl	___ashlsi3
+___ashlsi3:
+;	.stabd	68,0,441
+LFBB1X:
+	pshs	y,u
+	leas	-10,s
+	leay	,x
+	ldx	16,s
+	ldu	18,s
+;	.stabd	68,0,442
+	ldd	20,s
+	bne	L2X
+;	.stabd	68,0,443
+	stx	,y
+	stu	2,y
+	lbra	L1X
+L2X:
+;	.stabd	68,0,445
+	stx	6,s
+	stu	8,s
+;	.stabd	68,0,446
+	ldd	#16
+	subd	20,s	;subhi: R:d -= 20,s
+	std	,s	;movhi: R:d -> ,s w/ implied test of d
+;	.stabd	68,0,449
+	bgt	L4X
+;	.stabd	68,0,451
+	ldd	#0
+	std	4,s
+;	.stabd	68,0,452
+	ldd	,s
+	nega
+	negb
+	sbca	#0
+	tfr	d,x
+	tfr	u,d
+	jsr	_ashlhi3
+	bra	L7X
+L4X:
+LBB2X:
+;	.stabd	68,0,458
+	tfr	u,d
+	ldx	20,s
+	jsr	_ashlhi3
+	std	4,s
+;	.stabd	68,0,459
+	tfr	u,d
+	ldx	,s
+	jsr	_lshrhi3
+	tfr	d,u
+	ldd	6,s
+	ldx	20,s
+	jsr	_ashlhi3
+	std	,s
+	pshs	u
+	ora	,s+
+	orb	,s+
+L7X:
+LBE2X:
+;	.stabd	68,0,462
+	std	2,s
+	std	,y
+	ldx	4,s
+	stx	2,y
+L1X:
+;	.stabd	68,0,463
+	leax	,y
+	leas	10,s
+	puls	y,u,pc
+
+
+	.globl	_lshrhi3
+_lshrhi3:
+	pshs	x
+1$:	leax	-1,x
+	cmpx	#-1
+	beq	2$
+	lsra
+	rorb
+	bra	1$
+2$:	puls	x,pc
+
+
+	.globl	_ashlhi3
+_ashlhi3:
+	pshs	x
+3$:	leax	-1,x
+	cmpx	#-1
+	beq	4$
+	aslb
+	rola
+	bra	3$
+4$:	puls	x,pc
+
+
+	.globl	_ashrhi3
+_ashrhi3:
+	pshs	x
+5$:	leax	-1,x
+	cmpx	#-1
+	beq	6$
+	asra
+	rorb
+	bra	5$
+6$:	puls	x,pc
+
+#endif

@@ -1,0 +1,14 @@
+DFBOARD
+=====
+
+DF's 6809 Board rev 1.1 with 64K of RAM
+
+Memory Map
+==========
+0000-00FF    Interrupt stack
+0100-7FFF    Code/Data for kernel (take care to keep this below 8000)
+8000-F7FF    User space
+F800-F9FF    udata
+FA00-FF7F    bootloader
+FF80-FFEF    I/O
+FFF0-FFFF    Vectors
