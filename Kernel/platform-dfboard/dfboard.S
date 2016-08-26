@@ -49,7 +49,7 @@
 	.dw	firq_handler		; $FFF6 FIRQ
 	.dw	interrupt_handler	; $FFF8 IRQ
 	.dw	unix_syscall_entry	; $FFFA SWI
-	.dw	nmi_handler		; $FFFC NMI       FIXME: needs to handle bad NMI!
+	.dw	nmi_handler		; $FFFC NMI
 	.dw	badswi_handler		; $FFFE RESET
 
 

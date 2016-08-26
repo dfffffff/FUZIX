@@ -6,7 +6,7 @@
 #include "device.h"
 #include "devtty.h"
 
-static const char *sysname[] = {"DFBOARD", "Unknown"};
+static const char *sysname[] = {"DF's 6809 Board", "Unknown"};
 uint8_t system_id;
 
 void map_init(void)

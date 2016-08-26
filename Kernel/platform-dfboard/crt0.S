@@ -9,10 +9,10 @@
 
 	; imported symbols
 	.globl	_fuzix_main
+	.globl	_system_id
 	.globl	init_early
 	.globl	init_hardware
 	.globl	kstack_top
-	.globl	_system_id
 
 #include "boot.h"
 

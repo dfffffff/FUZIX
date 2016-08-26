@@ -9,6 +9,7 @@
 /* Single tasking - for now while we get it booting */
 #undef CONFIG_SINGLETASK
 
+/* Banks as reported to user space */
 #define CONFIG_BANKS 1
 
 /* Pure swap */

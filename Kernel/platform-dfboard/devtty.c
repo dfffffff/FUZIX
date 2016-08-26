@@ -55,6 +55,7 @@ void tty_setup(uint8_t minor)
 {
 	if (minor != 1)
 		panic("tty_setup: minor != 1");
+	ttydata[minor].termios.c_cc[VERASE] = 0x7F; /* rubout character */
 }
 
 int tty_carrier(uint8_t minor)

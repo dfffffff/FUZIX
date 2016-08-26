@@ -41,7 +41,7 @@ FILESYSTEM_CROSSENDIAN = -X
 FILESYSTEM_ISIZE = 256
 FILESYSTEM_FSIZE = 65535
 FILESYSTEM = \
-	//init                  0755 $(util-init.result) \
+	/init                   0755 $(util-init.result) \
 	/bin/banner             0755 $(util-banner.result) \
 	/bin/basename           0755 $(util-basename.result) \
 	/bin/bd                 0755 $(util-bd.result) \
@@ -117,44 +117,44 @@ FILESYSTEM = \
 	/bin/write              0755 $(util-write.result) \
 	/bin/xargs              0755 $(util-xargs.result) \
 	/bin/yes                0755 $(util-yes.result) \
-    /bin/ac                 0755 $(v7-cmd-ac.result) \
-    /bin/at                 0755 $(v7-cmd-at.result) \
-    /bin/atrun              0755 $(v7-cmd-atrun.result) \
-    /bin/col                0755 $(v7-cmd-col.result) \
-    /bin/comm               0755 $(v7-cmd-comm.result) \
-    /bin/cron               0755 $(v7-cmd-cron.result) \
-    /bin/crypt              0755 $(v7-cmd-crypt.result) \
-    /bin/dc                 0755 $(v7-cmd-dc.result) \
-    /bin/dd                 0755 $(v7-cmd-dd.result) \
-    /bin/deroff             0755 $(v7-cmd-deroff.result) \
-    /bin/diff               0755 $(v7-cmd-diff.result) \
-    /bin/diff3              0755 $(v7-cmd-diff3.result) \
-    /bin/diffh              0755 $(v7-cmd-diffh.result) \
-    /bin/join               0755 $(v7-cmd-join.result) \
-    /bin/makekey            0755 $(v7-cmd-makekey.result) \
-    /bin/mesg               0755 $(v7-cmd-mesg.result) \
-    /bin/newgrp             0755 $(v7-cmd-newgrp.result) \
-    /bin/pr                 0755 $(v7-cmd-pr.result) \
-    /bin/ptx                0755 $(v7-cmd-ptx.result) \
-    /bin/rev                0755 $(v7-cmd-rev.result) \
-    /bin/split              0755 $(v7-cmd-split.result) \
-    /bin/su                 0755 $(v7-cmd-su.result) \
-    /bin/sum                0755 $(v7-cmd-sum.result) \
-    /bin/test               0755 $(v7-cmd-test.result) \
-    /bin/time               0755 $(v7-cmd-time.result) \
-    /bin/tsort              0755 $(v7-cmd-tsort.result) \
-    /bin/wall               0755 $(v7-cmd-wall.result) \
+	/bin/ac                 0755 $(v7-cmd-ac.result) \
+	/bin/at                 0755 $(v7-cmd-at.result) \
+	/bin/atrun              0755 $(v7-cmd-atrun.result) \
+	/bin/col                0755 $(v7-cmd-col.result) \
+	/bin/comm               0755 $(v7-cmd-comm.result) \
+	/bin/cron               0755 $(v7-cmd-cron.result) \
+	/bin/crypt              0755 $(v7-cmd-crypt.result) \
+	/bin/dc                 0755 $(v7-cmd-dc.result) \
+	/bin/dd                 0755 $(v7-cmd-dd.result) \
+	/bin/deroff             0755 $(v7-cmd-deroff.result) \
+	/bin/diff               0755 $(v7-cmd-diff.result) \
+	/bin/diff3              0755 $(v7-cmd-diff3.result) \
+	/bin/diffh              0755 $(v7-cmd-diffh.result) \
+	/bin/join               0755 $(v7-cmd-join.result) \
+	/bin/makekey            0755 $(v7-cmd-makekey.result) \
+	/bin/mesg               0755 $(v7-cmd-mesg.result) \
+	/bin/newgrp             0755 $(v7-cmd-newgrp.result) \
+	/bin/pr                 0755 $(v7-cmd-pr.result) \
+	/bin/ptx                0755 $(v7-cmd-ptx.result) \
+	/bin/rev                0755 $(v7-cmd-rev.result) \
+	/bin/split              0755 $(v7-cmd-split.result) \
+	/bin/su                 0755 $(v7-cmd-su.result) \
+	/bin/sum                0755 $(v7-cmd-sum.result) \
+	/bin/test               0755 $(v7-cmd-test.result) \
+	/bin/time               0755 $(v7-cmd-time.result) \
+	/bin/tsort              0755 $(v7-cmd-tsort.result) \
+	/bin/wall               0755 $(v7-cmd-wall.result) \
 	/bin/arithmetic         0755 $(v7-games-arithmetic.result) \
-    /usr/games/backgammon   0755 $(v7-games-backgammon.result) \
-    /usr/games/fish         0755 $(v7-games-fish.result) \
-    /usr/games/wump         0755 $(v7-games-wump.result) \
+	/usr/games/backgammon   0755 $(v7-games-backgammon.result) \
+	/usr/games/fish         0755 $(v7-games-fish.result) \
+	/usr/games/wump         0755 $(v7-games-wump.result) \
 	/bin/sh                 0755 $(v7-sh.result) \
 
 # These don't work yet. \
-    /bin/accton             0755 $(Applications/V7/cmd/accton.result) \
-    /bin/look               0755 $(Applications/V7/cmd/look.result) \
+	/bin/accton             0755 $(Applications/V7/cmd/accton.result) \
+	/bin/look               0755 $(Applications/V7/cmd/look.result) \
 
 standard_files = \
-	/var/					0755 '' \
-	/var/run/				0755 ''
+	/var/                   0755 '' \
+	/var/run/               0755 ''
 

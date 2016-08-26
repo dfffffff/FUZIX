@@ -1,15 +1,20 @@
-;
-;	TODO: udata needs to be in common space so swap needs to be smarter
-;	about split udata
-;
+;;;
+;;; dfboard tricks
+;;;
+
 	.module	tricks
 
 	; imported
 	.globl	_newproc
 	.globl	_chksigs
 	.globl	_getproc
+	.globl	_swapper
+	.globl	_swapout
+	.globl	_runticks
 	.globl	_trap_monitor
 	.globl	map_kernel
+	.globl	outx
+	.globl	outstring
 
 	; exported
 	.globl	_switchout
@@ -26,8 +31,6 @@
 _ramtop:
 	.dw	0
 
-newpp:
-	.dw	0
 
 ; Switchout switches out the current process, finds another that is READY,
 ; possibly the same process, and switches it in.  When a process is
@@ -41,17 +44,18 @@ _switchout:
 	jsr	_chksigs
 
 	; save machine state, including Y and U used by our C code
-	ldd	#0 ; return code set here is ignored, but _switchin can 
-	; return from either _switchout OR _dofork, so they must both write 
+	ldd	#0 ; return code set here is ignored, but _switchin can
+	; return from either _switchout OR _dofork, so they must both write
 	; U_DATA__U_SP with the following on the stack:
 	pshs	d,y,u
 	sts	U_DATA__U_SP	; this is where the SP is restored in _switchin
 
 	; find another (or same) process to run, returned in X
 	jsr	_getproc
-	jsr	_switchin
+	bsr	_switchin
 	; we should never get here
 	jsr	_trap_monitor
+
 
 badswitchmsg:
 	.ascii	"_switchin: FAIL"
@@ -60,31 +64,35 @@ badswitchmsg:
 	.db	0
 
 
-; new process pointer is in X
+;
+; New process pointer is in X
+;
 _switchin:
-	orcc	#0x10		; irq off
+	orcc	#0x10				; irq off
 
-	lds	#istack_top		; temporary stack
+	lds	#istack_top-2			; temporary stack
+	stx	,s				; save new process pointer
 
-	stx	newpp
+	lda	P_TAB__P_PAGE_OFFSET+1,x	; LSB of 16-bit page no
+	bne	not_swapped			; in memory ?
 
-	; get process table
-	lda	P_TAB__P_PAGE_OFFSET+1,x		; LSB of 16-bit page no
-	cmpa	#0
-	bne	not_swapped
+	; swap out the current process
+	ldx	U_DATA__U_PTAB			; load current process pointer
+	lda	P_TAB__P_PAGE_OFFSET+1,x	; LSB of 16-bit page no
+	beq	already_swappedout		; in memory ?
+	jsr	_swapout			; int swapout(ptptr p)
+	leax	,x
+	bne	switchinfail
 
-	jsr	_swapper		; void swapper(ptptr p)
-	ldx	newpp
-;	lda	P_TAB__P_PAGE_OFFSET+1,x
+already_swappedout:
+	ldx	,s				; load new process pointer
+	jsr	_swapper			; void swapper(ptptr p)
+	ldx	,s				; load new process pointer
 
 not_swapped:
-	; we have now new stacks so get new stack pointer before any jsr
-;	lds	U_DATA__U_SP
-
 	; get back kernel page so that we see process table
 	jsr	map_kernel
 
-	ldx	newpp
 	; check u_data->u_ptab matches what we wanted
 	cmpx	U_DATA__U_PTAB
 	bne	switchinfail
@@ -111,7 +119,6 @@ not_swapped:
 swtchdone:
 	rts
 
-
 switchinfail:
 	jsr	outx
 	ldx	#badswitchmsg
@@ -119,12 +126,7 @@ switchinfail:
 	; something went wrong and we didn't switch in what we asked for
 	jmp	_trap_monitor
 
-	.area	.data
 
-fork_proc_ptr:
-	.dw	0 ; (C type is struct p_tab *) -- address of child process p_tab entry
-
-	.area	.common
 ;
 ;	Called from _fork. We are in a syscall, the uarea is live as the
 ;	parent uarea. The kernel is the mapped object.
@@ -133,8 +135,7 @@ _dofork:
 	; always disconnect the vehicle battery before performing maintenance
 	orcc	#0x10 ; should already be the case ... belt and braces.
 
-	; new process in X, get parent pid into y
-
+	; new process in X, get parent pid into X
 	stx	fork_proc_ptr
 	ldx	P_TAB__P_PID_OFFSET,x
 
@@ -151,7 +152,6 @@ _dofork:
 
 	; now we're in a safe state for _switchin to return in the parent
 	; process.
-
 	ldx	U_DATA__U_PTAB
 	jsr	_swapout
 	leax	,x
@@ -182,3 +182,10 @@ forked_up:
 	ldx	#-1
 	puls	d,y,u,pc
 	rts
+
+
+	.area	.data
+
+fork_proc_ptr:
+	.dw	0 ; (C type is struct p_tab *) -- address of child process p_tab entry
+
