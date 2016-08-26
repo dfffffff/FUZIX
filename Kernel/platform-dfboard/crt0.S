@@ -10,6 +10,7 @@
 	; imported symbols
 	.globl	_fuzix_main
 	.globl	_system_id
+	.globl	_mpu_id
 	.globl	init_early
 	.globl	init_hardware
 	.globl	kstack_top
@@ -26,6 +27,8 @@ start:
 	tsta
 	bne	no_6309		; MPU is 6309 ?
 	fcb	$11,$3D,$00	; LDMD #0  (6809 emulation mode)
+	ldd	#6309
+	std	_mpu_id
 no_6309:
 	lds	#kstack_top
 	ldx	#s_.bss		; __sectionbase_.bss__

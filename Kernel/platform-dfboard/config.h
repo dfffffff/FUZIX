@@ -17,13 +17,15 @@
 #define CONFIG_SPLIT_UDATA
 #define CONFIG_USERMEM_DIRECT
 
+#define PTABSIZE    20         /* Max processes */
+
 /* And swapping */
 #define SWAPDEV     1          /* Uses IDE slice 1 */
 #define SWAP_SIZE   0x40       /* 32K in 512 byte blocks */
-#define SWAPBASE    0x8000     /* We swap the lot, including stashed uarea */
+#define SWAPBASE    0x8000     /* We swap the lot, excluding stashed uarea */
 #define SWAPTOP     0xF800     /* so it's a round number of 512 byte sectors */
 #define UDATA_SIZE  0x0200     /* one block */
-#define MAX_SWAPS   32
+#define MAX_SWAPS   PTABSIZE
 #define swap_map(x) ((uint8_t *)(x))
 
 /* Permit large I/O requests to bypass cache and go direct to userspace */
