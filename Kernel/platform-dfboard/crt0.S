@@ -21,15 +21,8 @@
 
 	.area	.discard
 start:
-	orcc	#0x10		; interrupts definitely off
+	orcc	#$10		; interrupts definitely off
 
-	fcb	$1F,$C8		; TFR 0,A
-	tsta
-	bne	no_6309		; MPU is 6309 ?
-	fcb	$11,$3D,$00	; LDMD #0  (6809 emulation mode)
-	ldd	#6309
-	std	_mpu_id
-no_6309:
 	lds	#kstack_top
 	ldx	#__sectionbase_.bss__
 	ldy	#__sectionlen_.bss__
@@ -38,19 +31,28 @@ bss_wipe:
 	sta	,x+
 	leay	-1,y
 	bne	bss_wipe
-	; This might be in BSS so don't save until we've wiped!
-	lda	#0
-	sta	_system_id	; what sort of a box are we ?
+
+	ldb	#0		; humm well, zero as system id
+	ldx	#6809		; default MPU
+
+	fcb	$1F,$C8		; TFR 0,A
+	tsta
+	bne	no_6309		; MPU is 6309 ?
+	fcb	$11,$3D,$00	; LDMD #0  (6809 emulation mode)
+	ldx	#6309
+no_6309:
+
+	stb	_system_id	; what sort of a box are we ?
+	stx	_mpu_id		; what mpu in that box ?
 
 	jsr	init_early
 	jsr	init_hardware
-
 	jmp	main
 
 
 	.area	.text
 main:
 	jsr	_fuzix_main
-	orcc	#0x10
+	orcc	#$10
 	ldb	#-1
 	jmp	F_ERROR

@@ -9,7 +9,7 @@
 static const char *sysname[] = {"DF's Board", "Unknown"};
 #define SYSNAME_MAX (uint16_t)(sizeof(sysname)/sizeof(char*)-1)
 uint8_t system_id = -1;
-uint16_t mpu_id = 6809;
+uint16_t mpu_id = -1;
 
 void map_init(void)
 {
