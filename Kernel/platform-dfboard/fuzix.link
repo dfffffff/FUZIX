@@ -1,3 +1,5 @@
+define __sectionbase_.bss__ s_.bss
+define __sectionlen_.bss__ l_.bss
 section .istack load 0x0000
 section .text load 0x0100
 section .text2

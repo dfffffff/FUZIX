@@ -31,8 +31,8 @@ start:
 	std	_mpu_id
 no_6309:
 	lds	#kstack_top
-	ldx	#s_.bss		; __sectionbase_.bss__
-	ldy	#l_.bss		; __sectionlen_.bss__
+	ldx	#__sectionbase_.bss__
+	ldy	#__sectionlen_.bss__
 	clra
 bss_wipe:
 	sta	,x+
