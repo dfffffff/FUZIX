@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+m6809-unknown-none-ar "$@"
+if [ "$1" = rc -o "$1" = -rc ]; then
+	m6809-unknown-none-ranlib "$2"
+fi

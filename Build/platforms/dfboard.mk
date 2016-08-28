@@ -8,9 +8,9 @@ A = a
 TARGETCC = m6809-unknown-gcc
 TARGETCPP = m6809-unknown-cpp -nostdinc -undef -P
 TARGETAS = m6809-unknown-as
-TARGETAR = $(abspath $(BUILD)/tools/dftools-ar) m6809-unknown-ranlib m6809-unknown-ar
+TARGETAR = m6809-unknown-ar
 TARGETLD = m6809-unknown-ld
-TARGETOBJCOPY = $(abspath $(BUILD)/tools/dftools-objcopy)
+TARGETOBJCOPY = m6809-unknown-objcopy
 
 targetgcc.includes += -I$(TOP)/Library/include/6809
 

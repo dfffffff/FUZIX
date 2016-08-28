@@ -1,0 +1,2 @@
+#!/bin/sh
+exec m6809-unknown-none-as "$@"

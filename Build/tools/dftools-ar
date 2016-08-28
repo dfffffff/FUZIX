@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-RANLIB=$1
-shift
-"$@"
-if [ "$2" = -rc ]; then
-	$RANLIB "$3"
-fi
