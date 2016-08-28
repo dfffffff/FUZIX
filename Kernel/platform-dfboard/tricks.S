@@ -37,7 +37,7 @@ _ramtop:
 ; restarted after calling switchout, it thinks it has just returned
 ; from switchout().
 ;
-; 
+;
 ; This function can have no arguments or auto variables.
 _switchout:
 	orcc	#0x10		; irq off

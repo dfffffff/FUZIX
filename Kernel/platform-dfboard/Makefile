@@ -5,7 +5,7 @@ C3SRCS = libc.c
 
 CDSRCS = discard.c
 
-DSRCS = 
+DSRCS =
 
 ASRCS = crt0.S dfboard.S tricks.S commonmem.S
 
