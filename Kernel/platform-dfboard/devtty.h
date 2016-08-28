@@ -1,6 +1,6 @@
 #ifndef __DEVTTY_DOT_H__
 #define __DEVTTY_DOT_H__
 
-/* nothing for now */
+bool tty_caninsert(uint8_t minor);
 
 #endif

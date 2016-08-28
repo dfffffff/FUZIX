@@ -27,28 +27,23 @@ void kputchar(char c)
 
 ttyready_t tty_writeready(uint8_t minor)
 {
-	uint8_t c;
-	if (minor == 1)
-		return TTY_READY_NOW;
-	else
+	if (minor != 1)
 		panic("tty_writeready: minor != 1");
-/*	c = *uart_status;
-	return (c & 16) ? TTY_READY_NOW : TTY_READY_SOON;*/ /* TX DATA empty */
+	return TTY_READY_NOW;
 }
 
 void tty_putc(uint8_t minor, unsigned char c)
 {
-	if (minor == 1)
-		F_OUTCHAR(c);
-	else
+	if (minor != 1)
 		panic("tty_putc: minor != 1");
+	F_OUTCHAR(c);
 }
 
 void tty_sleeping(uint8_t minor)
 {
 	if (minor != 1)
 		panic("tty_sleeping: minor != 1");
-    used(minor);
+	used(minor);
 }
 
 void tty_setup(uint8_t minor)
@@ -65,7 +60,9 @@ int tty_carrier(uint8_t minor)
 	return 1;
 }
 
-void platform_interrupt(void)
+bool tty_caninsert(uint8_t minor)
 {
-	timercheck();
+	if (minor != 1)
+		panic("tty_caninsert: minor != 1");
+	return ttyinq[minor].q_count < ttyinq[minor].q_size;
 }

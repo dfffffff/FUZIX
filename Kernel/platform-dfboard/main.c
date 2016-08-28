@@ -6,8 +6,18 @@
 #include "device.h"
 #include "devtty.h"
 
+void platform_interrupt(void)
+{
+	timercheck();
+	keycheck();
+}
+
 void platform_idle(void)
 {
+	uint8_t cc;
+	cc = di();
+	keycheck();
+	irqrestore(cc);
 }
 
 void platform_discard(void)

@@ -13,32 +13,32 @@
 	.globl	map_restore
 	.globl	init_early
 	.globl	init_hardware
+	.globl	outchar
 	.globl	_program_vectors
 	.globl	_need_resched
-
 	.globl	_ramsize
 	.globl	_procmem
-
-	; imported
-	.globl	unix_syscall_entry
-	.globl	null_handler
-	.globl	_vtoutput
-	.globl	_timer_interrupt
-	.globl	nmi_handler
-
-	; exported debugging tools
 	.globl	_trap_monitor
 	.globl	_trap_reboot
-	.globl	outchar
 	.globl	_di
 	.globl	_ei
 	.globl	_irqrestore
 	.globl	_timercheck
+	.globl	_keycheck
 	.globl	__outchar
 	.globl	__inchar
 
+	; imported
+	.globl	unix_syscall_entry
+	.globl	null_handler
+	.globl	nmi_handler
+	.globl	_timer_interrupt
+	.globl	_tty_inproc
+	.globl	_tty_caninsert
+
 #define INCLUDE_LIB_BOOT
 #include "boot.h"
+#include "config.h"
 #include "kernel.def"
 #include "../kernel09.def"
 
@@ -81,7 +81,7 @@ init_hardware:
 	lda	BOOT.PORTA
 	anda	#BOOT.B_FAST
 	sta	,-s
-	ldd	#12500		; = 5000000/8/50
+	ldd	#5000000/8/TICKSPERSEC
 	tst	,s+
 	bne	fast
 	lsra
@@ -99,23 +99,23 @@ fast:	std	PTM.MBR3
 
 
 _trap_reboot:
-	orcc	#0x10
+	orcc	#$10
 	ldb	#-2
 	jmp	F_ERROR		; throw an error for now, TODO
 
 _trap_monitor:
-	orcc	#0x10
+	orcc	#$10
 	ldb	#-3
 	jmp	F_ERROR		; throw an error for now, TODO
 
 
 _di:
 	tfr	cc,b		; return the old irq state
-	orcc	#0x10
+	orcc	#$10
 	rts
 
 _ei:
-	andcc	#0xef
+	andcc	#$EF
 	rts
 
 _irqrestore:			; B holds the data
@@ -136,19 +136,28 @@ map_save:
 	rts
 
 
-;extern int tty_inproc(uint8_t minor, unsigned char c);
-_timercheck
-	tst	PTM.STA
+_timercheck:
+	ldb	PTM.STA
 	bpl	tcend
-	tst	PTM.TC3
+	ldb	PTM.TC3
 	jsr	_timer_interrupt
+tcend:	rts
+
+;extern bool tty_caninsert(uint8_t minor);
+;extern int tty_inproc(uint8_t minor, unsigned char c);
+_keycheck:
+kckey:	ldb	#1
+	jsr	_tty_caninsert
+	tstb
+	beq	kcend
 	jsr	F_INCHARNB
-	bcc	tcend
+	bcc	kcend
 	pshs	b
 	ldb	#1
 	jsr	_tty_inproc
-	puls	b,pc
-tcend:	rts
+	leas	1,s
+	bra	kckey
+kcend:	rts
 
 
 ;

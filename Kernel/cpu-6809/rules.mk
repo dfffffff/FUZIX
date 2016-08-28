@@ -1,7 +1,6 @@
 export CROSS_AS=m6809-unknown-gcc -c -x assembler-with-cpp
 export CROSS_LD=m6809-unknown-ld
 export CROSS_CC=m6809-unknown-gcc
-
 #export CROSS_CCOPTS=-Wall -O2 -I$(ROOT_DIR)/cpu-6809 -I$(ROOT_DIR)/platform-$(TARGET) -I$(ROOT_DIR)/include
 export CROSS_CCOPTS=-c -Wall -Os -msoft-reg-count=0 -mfar-stack-param -I$(ROOT_DIR)/cpu-6809 -I$(ROOT_DIR)/platform-$(TARGET) -I$(ROOT_DIR)/include
 # Workaround for gcc6809 bug - register copy propagation issue
