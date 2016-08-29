@@ -219,12 +219,15 @@ struct hd_geometry {
 #define major(x) ((x) >> 8)
 #define minor(x) ((x) & 0xFF)
 
-typedef struct cinode { // note: exists in memory *and* on disk
-    uint16_t   c_magic;           /* Used to check for corruption. */
-    uint16_t   c_dev;             /* Inode's device */
-    uint16_t   c_num;             /* Inode # */
-    dinode     c_node;
-    uint8_t    c_refs;            /* In-core reference count */
+/* In memory inode structure */
+typedef struct cinode {
+    uint16_t   c_magic;         /* Used to check for corruption. */
+    uint16_t   c_dev;           /* Inode's device */
+    uint16_t   c_num;           /* Inode # */
+    dinode     c_node;		/* On disk inode data */
+    uint8_t    c_refs;          /* In-core reference count */
+    uint8_t    c_readers;	/* Count of readers by oft entry */
+    uint8_t    c_writers;	/* Count of writers by oft entry */
     uint8_t    c_flags;           
 #define CDIRTY		0x80	/* Modified flag. */
 #define CRDONLY		0x40	/* On a read only file system */
@@ -823,7 +826,7 @@ extern ptptr getproc(void);
 extern void newproc(ptptr p);
 extern ptptr ptab_alloc(void);
 extern void ssig(ptptr proc, uint8_t sig);
-extern void chksigs(void);
+extern uint8_t chksigs(void);
 extern void program_vectors(uint16_t *pageptr);
 extern void sgrpsig(uint16_t pgrp, uint8_t sig);
 extern void unix_syscall(void);
