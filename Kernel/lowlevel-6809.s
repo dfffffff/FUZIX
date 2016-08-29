@@ -464,7 +464,8 @@ outnibble:
         cmpa #9
         ble numeral ; less than 10?
         adda #0x07 ; start at 'A' (10+7+0x30=0x41='A')
-numeral: adda #0x30 ; start at '0' (0x30='0')
+numeral:
+	adda #0x30 ; start at '0' (0x30='0')
         jsr outchar
         rts
 
@@ -558,7 +559,6 @@ _swab:
 	exg a,b		; swap bytes over
 	exg d,x		; back into result
 	rts
-
 
 _ashlhi3:
 	pshs	x
