@@ -4,6 +4,12 @@
 
 	.module	tricks
 
+	; exported
+	.globl	_switchout
+	.globl	_switchin
+	.globl	_dofork
+	.globl	_ramtop
+
 	; imported
 	.globl	_newproc
 	.globl	_chksigs
@@ -15,12 +21,6 @@
 	.globl	map_kernel
 	.globl	outx
 	.globl	outstring
-
-	; exported
-	.globl	_switchout
-	.globl	_switchin
-	.globl	_dofork
-	.globl	_ramtop
 
 #include "kernel.def"
 #include "../kernel09.def"
@@ -40,7 +40,7 @@ _ramtop:
 ;
 ; This function can have no arguments or auto variables.
 _switchout:
-	orcc	#0x10		; irq off
+	orcc	#$10		; irq off
 	jsr	_chksigs
 
 	; save machine state, including Y and U used by our C code
@@ -68,7 +68,7 @@ badswitchmsg:
 ; New process pointer is in X
 ;
 _switchin:
-	orcc	#0x10				; irq off
+	orcc	#$10				; irq off
 
 	lds	#istack_top-2			; temporary stack
 	stx	,s				; save new process pointer
@@ -115,7 +115,7 @@ not_swapped:
 	; enable interrupts, if the ISR isn't already running
 	lda	U_DATA__U_ININTERRUPT
 	bne	swtchdone ; in ISR, leave interrupts off
-	andcc	#0xef
+	andcc	#$EF
 swtchdone:
 	rts
 
@@ -133,7 +133,7 @@ switchinfail:
 ;
 _dofork:
 	; always disconnect the vehicle battery before performing maintenance
-	orcc	#0x10 ; should already be the case ... belt and braces.
+	orcc	#$10 ; should already be the case ... belt and braces.
 
 	; new process in X, get parent pid into X
 	stx	fork_proc_ptr

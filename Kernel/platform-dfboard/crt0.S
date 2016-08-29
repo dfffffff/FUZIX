@@ -7,7 +7,7 @@
 	; exported
 	.globl	start
 
-	; imported symbols
+	; imported
 	.globl	_fuzix_main
 	.globl	_system_id
 	.globl	_mpu_id

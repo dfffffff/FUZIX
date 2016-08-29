@@ -58,7 +58,7 @@
 init_early:
 	ldx	#null_handler
 	stx	1
-	lda	#0x7E
+	lda	#$7E
 	sta	0
 	rts
 
@@ -67,7 +67,7 @@ init_hardware:
 	std	_ramsize
 	ldd	#(U_DATA-PROGBASE)/$400 ;32
 	std	_procmem
-	; Init PTM for 50Hz interrupt
+	; Init PTM for timer interrupt
 	lda	#%00000011	; PTM interrupt disabled
 	sta	PTM.CR2
 	clra
@@ -219,5 +219,5 @@ _need_resched:
 
 ; make sure the kernel finish before user space
 	.area	.endofkernel
-kernend	.blkb	PROGBASE-kernend
+kernend	.blkb	(PROGBASE)-kernend
 
