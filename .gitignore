@@ -17,3 +17,7 @@ size.report
 # Build system output
 .obj
 bin
+# My stuff
+filesystem-*.img
+a.out
+Applications/V7/cmd/sh/Makefile.6809_2
