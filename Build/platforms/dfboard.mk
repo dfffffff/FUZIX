@@ -28,8 +28,8 @@ include $(BUILD)/rules/targetgcc.rules.mk
 # Extra, platform-specific libc source files (relative to Library/libs).
 
 libc-functions.localsrcs += \
-	setjmp_6809.s
-#	ashlsi3_6809.s
+	setjmp_6809.s \
+	ashlsi3_6809.s
 
 # If host has wrong endianess
 liberror.flags = -X
@@ -156,6 +156,7 @@ FILESYSTEM = \
 	/bin/look               0755 $(Applications/V7/cmd/look.result) \
 
 standard_files = \
+	/root/                  0700 '' \
 	/var/                   0755 '' \
 	/var/run/               0755 ''
 

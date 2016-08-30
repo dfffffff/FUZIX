@@ -8,6 +8,7 @@
 #define VERBOSE
 
 #define IMAGE "filesystem-dfboard.img"
+//#define IMAGE "Standalone/filesystem-src/fuzixfs.dsk"
 FILE *fp;
 
 

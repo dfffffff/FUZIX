@@ -44,7 +44,7 @@ clean:
 	rm -f *.o *~ *.s19
 
 image:
-	$(CROSS_LD) -o fuzix.s19 --map=../fuzix.map --script=fuzix.link \
+	$(CROSS_LD) -o fuzix.s19 -Map=../fuzix.map --script=fuzix.link \
 	crt0.o commonmem.o \
 	dfboard.o discard.o ../simple.o \
 	../start.o ../version.o ../lowlevel-6809.o \
