@@ -1,5 +1,7 @@
 define __sectionbase_.bss__ s_.bss
 define __sectionlen_.bss__ l_.bss
+define __sectionbase_.udata__ s_.udata
+define __sectionlen_.udata__ l_.udata
 section .istack load 0x0000
 section .text load 0x0100
 section .text2
@@ -7,8 +9,9 @@ section .bss
 section .data
 section .common
 section .text3
-section .endofkernel
+section .end_of_kernel
 section .discard load 0x9000
-section .udata load 0xF800
+section .udata load 0xFA00
+section .end_of_user
 section .vectors load 0xFFF0
 entry start

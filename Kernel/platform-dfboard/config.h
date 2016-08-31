@@ -23,7 +23,7 @@
 #define SWAPDEV     1          /* Uses IDE slice 1 */
 #define SWAP_SIZE   0x40       /* 32K in 512 byte blocks */
 #define SWAPBASE    0x8000     /* We swap the lot, excluding stashed uarea */
-#define SWAPTOP     0xF800     /* so it's a round number of 512 byte sectors */
+#define SWAPTOP     0xFA00     /* so it's a round number of 512 byte sectors */
 #define UDATA_SIZE  0x0200     /* one block */
 #define MAX_SWAPS   PTABSIZE
 #define swap_map(x) ((uint8_t *)(x))
@@ -35,13 +35,13 @@
 #undef CONFIG_VT
 #undef CONFIG_VT_SIMPLE
 
-#define TICKSPERSEC 50      /* Ticks per second */
-#define PROGBASE    0x8000  /* also data base */
-#define PROGLOAD    0x8000  /* also data base */
-#define PROGTOP     0xF800  /* Top of program */
+#define TICKSPERSEC 50         /* Ticks per second */
+#define PROGBASE    SWAPBASE   /* also data base */
+#define PROGLOAD    SWAPBASE   /* also data base */
+#define PROGTOP     SWAPTOP    /* Top of program */
 
 /* We need a tidier way to do this from the loader */
-#define CMDLINE NULL        /* Location of root dev name */
+#define CMDLINE NULL           /* Location of root dev name */
 
 /* Device parameters */
 #define BOOT_TTY    (512+1) /* Set this to default device for stdio/stderr */

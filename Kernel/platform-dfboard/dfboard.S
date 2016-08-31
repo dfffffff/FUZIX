@@ -217,7 +217,11 @@ aciaerr:
 _need_resched:
 	.db	0
 
-; make sure the kernel finish before user space
-	.area	.endofkernel
+; make sure the kernel space finish before user space
+	.area	.end_of_kernel
 kernend	.blkb	(PROGBASE)-kernend
+
+; make sure the user space finish before the bootloader
+	.area	.end_of_user
+userend	.blkb	$FC00-userend
 

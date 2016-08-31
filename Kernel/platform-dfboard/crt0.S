@@ -24,13 +24,21 @@ start:
 	orcc	#$10		; interrupts definitely off
 
 	lds	#kstack_top
-	ldx	#__sectionbase_.bss__
-	ldy	#__sectionlen_.bss__
 	clra
+
+	ldu	#__sectionbase_.bss__
+	ldx	#__sectionlen_.bss__
 bss_wipe:
-	sta	,x+
-	leay	-1,y
+	sta	,u+
+	leax	-1,x
 	bne	bss_wipe
+
+	ldu	#__sectionbase_.udata__
+	ldx	#__sectionlen_.udata__
+udata_wipe:
+	sta	,u+
+	leax	-1,x
+	bne	udata_wipe
 
 	ldb	#0		; humm well, zero as system id
 	ldx	#6809		; default MPU
