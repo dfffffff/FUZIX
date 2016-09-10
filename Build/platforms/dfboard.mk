@@ -62,12 +62,14 @@ FILESYSTEM = \
 	/bin/du                 0755 $(util-du.result) \
 	/bin/echo               0755 $(util-echo.result) \
 	/bin/ed                 0755 $(util-ed.result) \
+	/bin/env                0755 $(util-env.result) \
 	/bin/factor             0755 $(util-factor.result) \
 	/bin/false              0755 $(util-false.result) \
 	/bin/fdisk              0755 $(util-fdisk.result) \
 	/bin/fgrep              0755 $(util-fgrep.result) \
 	/bin/fsck               0755 $(util-fsck.result) \
 	/bin/grep               0755 $(util-grep.result) \
+	/bin/groups             0755 $(util-groups.result) \
 	/bin/head               0755 $(util-head.result) \
 	/bin/id                 0755 $(util-id.result) \
 	/bin/kill               0755 $(util-kill.result) \
@@ -94,6 +96,7 @@ FILESYSTEM = \
 	/bin/reboot             0755 $(util-reboot.result) \
 	/bin/rm                 0755 $(util-rm.result) \
 	/bin/rmdir              0755 $(util-rmdir.result) \
+	/bin/sed                0755 $(util-sed.result) \
 	/bin/sleep              0755 $(util-sleep.result) \
 	/bin/sort               0755 $(util-sort.result) \
 	/bin/ssh                0755 $(util-ssh.result) \
@@ -102,13 +105,17 @@ FILESYSTEM = \
 	/bin/sum                0755 $(util-sum.result) \
 	/bin/sync               0755 $(util-sync.result) \
 	/bin/tail               0755 $(util-tail.result) \
+	/bin/tar                0755 $(util-tar.result) \
 	/bin/tee                0755 $(util-tee.result) \
+	/bin/telinit            0755 $(util-telinit.result) \
+	/bin/termcap            0755 $(util-termcap.result) \
 	/bin/touch              0755 $(util-touch.result) \
 	/bin/tr                 0755 $(util-tr.result) \
 	/bin/true               0755 $(util-true.result) \
 	/bin/umount             0755 $(util-umount.result) \
 	/bin/uname              0755 $(util-uname.result) \
 	/bin/uniq               0755 $(util-uniq.result) \
+	/bin/uptime             0755 $(util-uptime.result) \
 	/bin/uud                0755 $(util-uud.result) \
 	/bin/uue                0755 $(util-uue.result) \
 	/bin/wc                 0755 $(util-wc.result) \
