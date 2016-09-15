@@ -88,7 +88,6 @@ FILESYSTEM = \
 	/bin/od                 0755 $(util-od.result) \
 	/bin/pagesize           0755 $(util-pagesize.result) \
 	/bin/passwd             0755 $(util-passwd.result) \
-	/bin/patchcpm           0755 $(util-patchcpm.result) \
 	/bin/printenv           0755 $(util-printenv.result) \
 	/bin/prtroot            0755 $(util-prtroot.result) \
 	/bin/ps                 0755 $(util-ps.result) \
