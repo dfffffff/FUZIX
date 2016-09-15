@@ -13,6 +13,8 @@
 #include <kdata.h>
 #include <printf.h>
 
+/* FIXME: we need to put this back on boxes with a malloc but for now
+   lets keep it easy */
 #define ARGBUF_SIZE	2048
 
 struct binfmt_flat {
@@ -89,14 +91,14 @@ static int valid_hdr(inoptr ino, struct binfmt_flat *bf)
 
 /* For now we load the binary in one block, including code/data/bss. We can
    look at better formats, split binaries etc later maybe */
-static void relocate(struct binfmt_flat *bf, void *progbase, uint32_t size)
+static void relocate(struct binfmt_flat *bf, uaddr_t progbase, uint32_t size)
 {
-	uint32_t *rp = progbase + bf->reloc_start;
+	uint32_t *rp = (uint32_t *)(progbase + bf->reloc_start);
 	uint32_t n = bf->reloc_count;
 	while (n--) {
 		uint32_t v = *rp++;
 		if (v < size && !(v&1))	/* Revisit for non 68K */
-			*((uint32_t *)(rp + v)) += (uint32_t)progbase;
+			*((uint32_t *)(rp + v)) += progbase;
 	}
 }
 
@@ -122,7 +124,7 @@ arg_t _execve(void)
 	struct s_argblk *abuf, *ebuf;
 	int argc;
 	uint32_t bin_size;	/* Will need to be bigger on some cpus */
-	void *progbase, *top;
+	uaddr_t progbase, top;
 	uaddr_t go;
 
 	if (!(ino = n_open(name, NULLINOPTR)))
@@ -158,18 +160,9 @@ arg_t _execve(void)
 	bin_size = binflat->bss_end + binflat->stack_size;
 
 	/* Gather the arguments, and put them in temporary buffers. */
-	abuf = (struct s_argblk *) kmalloc(ARGBUF_SIZE);
-	if (abuf == NULL) {
-		udata.u_error = ENOMEM;
-		goto nogood2;
-	}
+	abuf = (struct s_argblk *) tmpbuf();
 	/* Put environment in another buffer. */
-	ebuf = (struct s_argblk *) kmalloc(ARGBUF_SIZE);
-	if (ebuf == NULL) {
-		kfree(abuf);
-		udata.u_error = ENOMEM;
-		goto nogood2;
-	}
+	ebuf = (struct s_argblk *) tmpbuf();
 
 	/* Read args and environment from process memory */
 	if (rargs(argv, abuf) || rargs(envp, ebuf))
@@ -214,13 +207,13 @@ arg_t _execve(void)
 
 	bin_size = binflat->reloc_start + 4 * binflat->reloc_count;
 	if (bin_size > 512)
-		bload(ino, 1, progbase + 512, bin_size - 512);
+		bload(ino, 1, (uint8_t *)progbase + 512, bin_size - 512);
 	
 	go = (uint32_t)progbase + binflat->entry;
 
 	relocate(binflat, progbase, bin_size);
 	/* This may wipe the relocations */	
-	uzero(progbase + binflat->data_end, 
+	uzero((uint8_t *)progbase + binflat->data_end,
 		binflat->bss_end - binflat->data_end + binflat->stack_size);
 
 	brelse(buf);
@@ -241,8 +234,8 @@ arg_t _execve(void)
 	uget((void *) ugetl(nargv, NULL), udata.u_name, 8);
 	memcpy(udata.u_ptab->p_name, udata.u_name, 8);
 
-	kfree(abuf);
-	kfree(ebuf);
+	brelse(abuf);
+	brelse(ebuf);
 	i_deref(ino);
 
 	/* Shove argc and the address of argv just below envp */
@@ -257,8 +250,8 @@ arg_t _execve(void)
 
 	// tidy up in various failure modes:
 nogood3:
-	kfree(abuf);
-	kfree(ebuf);
+	brelse(abuf);
+	brelse(ebuf);
 nogood2:
 	brelse(buf);
 nogood:

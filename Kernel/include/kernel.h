@@ -262,7 +262,7 @@ typedef struct filesys { // note: exists in mem and on disk
     blkno_t       s_free[FILESYS_TABSIZE];
     int16_t       s_ninode;
     uint16_t      s_inode[FILESYS_TABSIZE];
-    bool          s_fmod;
+    uint8_t       s_fmod;
     uint8_t       s_timeh;	/* bits 32-40: FIXME - wire up */
     uint32_t      s_time;
     blkno_t       s_tfree;
@@ -456,7 +456,7 @@ typedef struct u_data {
     /* Temporaries used for block I/O */
     blkno_t	u_block;	/* Block number */
     uint16_t	u_blkoff;	/* Offset in block */
-    uint16_t	u_nblock;	/* Number of blocks */
+    usize_t	u_nblock;	/* Number of blocks */
     uint8_t	*u_dptr;	/* Address for I/O */
 
 #ifdef CONFIG_LEVEL_2
@@ -472,9 +472,14 @@ typedef struct u_data {
 /* This is the user data structure, padded out to 512 bytes with the
  * System Stack.
  */
+
+#ifndef CONFIG_STACKSIZE
+#define CONFIG_STACKSIZE 512
+#endif
+
 typedef struct u_block {
         u_data u_d;
-        char   u_s [512 - sizeof(struct u_data)];
+        char   u_s [CONFIG_STACKSIZE - sizeof(struct u_data)];
 } u_block;
 
 
@@ -598,7 +603,8 @@ struct s_argblk {
  * by userspace.
  */
 #define SELECT_BEGIN		0x8000
-#define SELECT_END		0x8001
+#define SELECT_TEST		0x8001
+#define SELECT_END		0x8002
 
 #define IOCTL_NORMAL		0x0000	/* No special rules */
 #define IOCTL_SUPER		0x4000	/* Superuser needed */
@@ -679,10 +685,12 @@ extern usize_t valaddr(const char *base, usize_t size);
 extern int uget(const void *userspace_source, void *dest, usize_t count);
 extern int16_t  ugetc(const void *userspace_source);
 extern uint16_t ugetw(const void *userspace_source);
+extern uint32_t _ugetl(void *uaddr);
 extern int ugets(const void *userspace_source, void *dest, usize_t maxlen);
 extern int uput (const void *source,   void *userspace_dest, usize_t count);
 extern int uputc(uint16_t value,  void *userspace_dest);	/* u16_t so we don't get wacky 8bit stack games */
 extern int uputw(uint16_t value, void *userspace_dest);
+extern int _uputl(uint32_t val, void *uaddr);
 extern int uzero(void *userspace_dest, usize_t count);
 
 /* usermem.c or usermem_std.s */
@@ -825,27 +833,29 @@ extern void exec_or_die(void);
 
 
 /* select.c */
+#ifdef CONFIG_LEVEL_2
 extern void seladdwait(struct selmap *s);
 extern void selrmwait(struct selmap *s);
 extern void selwake(struct selmap *s);
-#ifdef CONFIG_LEVEL_2
 extern void selwait_inode(inoptr i, uint8_t smask, uint8_t setit);
 extern void selwake_inode(inoptr i, uint16_t mask);
 extern void selwake_pipe(inoptr i, uint16_t mask);
+extern void selwake_dev(uint8_t major, uint8_t minor, uint16_t mask);
 extern int _select(void);
 #else
 #define selwait_inode(i,smask,setit) do {} while(0)
 #define selwake_inode(i,smask) do {} while(0)
 #define selwake_pipe(i,smask) do {} while(0)
+#define selwake_dev(major,minor,smask) do {} while(0)
 #endif
 
 /* swap.c */
 extern uint16_t swappage;
 
-extern int swapread(uint16_t dev, blkno_t blkno, unsigned int nbytes,
-                    uint16_t buf, uint16_t page);
-extern int swapwrite(uint16_t dev, blkno_t blkno, unsigned int nbytes,
-		     uint16_t buf, uint16_t page);
+extern int swapread(uint16_t dev, blkno_t blkno, usize_t nbytes,
+                    uaddr_t buf, uint16_t page);
+extern int swapwrite(uint16_t dev, blkno_t blkno, usize_t nbytes,
+		     uaddr_t buf, uint16_t page);
 
 extern void swapmap_add(uint8_t swap);
 extern int swapmap_alloc(void);
@@ -884,7 +894,7 @@ extern void platform_discard(void);
 extern void platform_idle(void);
 extern uint8_t rtc_secs(void);
 extern void trap_reboot(void);
-extern uint8_t platform_param(unsigned char *p);
+extern uint8_t platform_param(char *p);
 
 /* Will need a uptr_t eventually */
 extern uaddr_t ramtop;	     /* Note: ramtop must be in common in some cases */

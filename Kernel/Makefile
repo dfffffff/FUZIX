@@ -135,7 +135,7 @@ target: include/kernel.h
 	ln -sf platform-$(TARGET) platform
 	+$(MAKE) -C platform-$(TARGET)
 
-$(OBJS): target
+#$(OBJS): target
 
 $(CSRCS): include/kernel.h
 

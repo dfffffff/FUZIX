@@ -55,26 +55,16 @@ extern uint16_t swab(uint16_t);
 #define	ntohs(x)	(x)
 #define ntohl(x)	(x)
 
-#define cpu_to_le16(x)	swab(x)
-#define le16_to_cpu(x)	swab(x)
-#define cpu_to_le32(x)	((((uint32_t)cpu_to_le16((x) & 0xFFFF)) << 16) | \
-				(uint32_t)cpu_to_le16((x) >> 16))
-#define le32_to_cpu(x)	cpu_to_le32(x)
-
-/* We don't need any banking bits really */
-#define CODE1
-#define CODE2
-#define COMMON
-#define VIDEO
-#define DISCARD
+#define cpu_to_le16(x)	le16_to_cpu(x)
+#define le16_to_cpu(x)	(uint16_t)(__builtin_bswap16((uint16_t)(x)))
+#define cpu_to_le32(x)	le32_to_cpu(x)
+#define le32_to_cpu(x)	(uint32_t)(__builtin_bswap32((uint32_t)(x)))
 
 /* Pointers are 32bit */
 #define POINTER32
 
 /* Sane behaviour for unused parameters */
 #define used(x)
-
-#define __fastcall__
 
 /* Our udata is handled slightly quirkily - use a register global */
 
@@ -83,3 +73,5 @@ register struct u_data *udata_ptr asm ("a5");
 #define udata (*udata_ptr)
 
 #define BIG_ENDIAN
+
+#define CONFIG_STACKSIZE	1024

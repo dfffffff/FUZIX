@@ -84,7 +84,6 @@ SRCS  = \
 	mount.c \
 	od.c \
 	passwd.c \
-	patchcpm.c \
 	ps.c \
 	sed.c \
 	sleep.c \
@@ -108,10 +107,10 @@ SRCS  = \
 	write.c \
 	xargs.c
 
-SRCTC = tget.c
+SRCTC = tget.c \
+        tchelp.c
 
-SKIPPED = \
-	tiddles.c \
+SKIPPED =
 
 
 OBJS = $(SRCS:.c=.o)
