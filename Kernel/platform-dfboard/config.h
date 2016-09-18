@@ -9,6 +9,9 @@
 /* Single tasking - for now while we get it booting */
 #undef CONFIG_SINGLETASK
 
+/* The tty is a spi display */
+#undef CONFIG_SPIDISPLAY
+
 /* Banks as reported to user space */
 #define CONFIG_BANKS 1
 
@@ -17,7 +20,11 @@
 #define CONFIG_SPLIT_UDATA
 #define CONFIG_USERMEM_DIRECT
 
+#ifdef CONFIG_SPIDISPLAY
+#define PTABSIZE    14          /* Max processes */
+#else
 #define PTABSIZE    20         /* Max processes */
+#endif
 
 /* And swapping */
 #define SWAPDEV     1          /* Uses IDE slice 1 */

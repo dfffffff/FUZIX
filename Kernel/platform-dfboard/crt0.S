@@ -63,4 +63,4 @@ main:
 	jsr	_fuzix_main
 	orcc	#$10
 	ldb	#-1
-	jmp	F_ERROR
+	jmp	BOOT.F_ERROR

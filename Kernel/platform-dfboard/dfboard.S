@@ -41,6 +41,14 @@
 #include "config.h"
 #include "kernel.def"
 #include "../kernel09.def"
+#ifdef CONFIG_SPIDISPLAY
+	.area	.text
+	lib	<io2/spi.i09>
+	lib	<lcd/SSD1306_devs.i09>
+	lib	<lcd/SSD1306_pic_4x8.i09>
+	.area	.bss
+	lib	<lcd/SSD1306_rmb.i09>
+#endif
 
 	.area	.vectors
 	.blkb	2			; $FFF0 RESERVED  lets the bootloader handle this for now
@@ -56,6 +64,12 @@
 	.area	.discard
 
 init_early:
+#ifdef CONFIG_SPIDISPLAY
+	ldd	#(SSD1306.F_FAST|SSD1306.F_HW)*$100|1
+	jsr	SSD1306.INIT
+	ldx	#SSD1306.DISPCHR
+	stx	BOOT.TF_OUTCHAR
+#endif
 	ldx	#null_handler
 	stx	1
 	lda	#$7E
@@ -69,14 +83,14 @@ init_hardware:
 	std	_procmem
 	; Init PTM for timer interrupt
 	lda	#%00000011	; PTM interrupt disabled
-	sta	PTM.CR2
+	sta	BOOT.PTM_CR2
 	clra
-	sta	PTM.CR13	; PTM set CR1 to 0
-	sta	PTM.CR2
+	sta	BOOT.PTM_CR13	; PTM set CR1 to 0
+	sta	BOOT.PTM_CR2
 	lda	#%01000011	; PTM timer 3,
 				; interrupt enabled, /8 prescaler,
 				; 16-bit continuous mode.
-	sta	PTM.CR13
+	sta	BOOT.PTM_CR13
 	;	######		; adjust for system speed, 68B09 run at 2.5MHz, 63C09 run at 5MHz
 	lda	BOOT.PORTA
 	anda	#BOOT.B_FAST
@@ -87,7 +101,7 @@ init_hardware:
 	lsra
 	rorb
 	;	######
-fast:	std	PTM.MBR3
+fast:	std	BOOT.PTM_MBR3
 	rts
 
 
@@ -101,12 +115,12 @@ fast:	std	PTM.MBR3
 _trap_reboot:
 	orcc	#$10
 	ldb	#-2
-	jmp	F_ERROR		; throw an error for now, TODO
+	jmp	BOOT.F_ERROR	; throw an error for now, TODO
 
 _trap_monitor:
 	orcc	#$10
 	ldb	#-3
-	jmp	F_ERROR		; throw an error for now, TODO
+	jmp	BOOT.F_ERROR	; throw an error for now, TODO
 
 
 _di:
@@ -137,9 +151,9 @@ map_save:
 
 
 _timercheck:
-	ldb	PTM.STA
+	ldb	BOOT.PTM_STA
 	bpl	tcend
-	ldb	PTM.TC3
+	ldb	BOOT.PTM_TC3
 	jsr	_timer_interrupt
 tcend:	rts
 
@@ -150,7 +164,7 @@ kckey:	ldb	#1
 	jsr	_tty_caninsert
 	tstb
 	beq	kcend
-	jsr	F_INCHARNB
+	jsr	BOOT.F_INCHARNB
 	bcc	kcend
 	pshs	b
 	ldb	#1
@@ -165,24 +179,24 @@ kcend:	rts
 ;
 firq_handler:
 	ldb	#-4
-	jmp	F_ERROR
+	jmp	BOOT.F_ERROR
 
 ;
 ;	FIXME:
 ;
 badswi_handler:
 	ldb	#-5
-	jmp	F_ERROR
+	jmp	BOOT.F_ERROR
 
 ;
 ;	debug output port, output to main tty for now
 ;
 outchar:
 ;	ldb	#-7
-;	jmp	F_ERROR
+;	jmp	BOOT.F_ERROR
 	pshs	b,a
 	ldb	,s
-	jsr	F_OUTCHAR
+	jsr	BOOT.F_OUTCHAR
 	puls	a,b,pc
 
 
@@ -202,14 +216,14 @@ __inchar:
 	ldb	BOOT.ACIA_SR
 	bitb	#BOOT.ACIA_SR_FE|BOOT.ACIA_SR_OVRN|BOOT.ACIA_SR_PE
 	bne	aciaerr
-	lsrb
-	bcc	__inchar
+	bitb	#BOOT.ACIA_SR_RDRF
+	beq	__inchar
 	ldb	BOOT.ACIA_RDR
 	rts
 
 aciaerr:
 	ldb	#-6
-	jmp	F_ERROR
+	jmp	BOOT.F_ERROR
 
 
 	.area	.common

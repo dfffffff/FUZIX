@@ -41,10 +41,11 @@ $(AOBJS): %$(BINEXT): %.S
 	$(CROSS_CC) -c $(ASOPTS) $< -o $@
 
 clean:
-	rm -f *.o *~ *.s19
+	rm -f *.o *~
 
 image:
-	$(CROSS_LD) -o fuzix.s19 -Map=../fuzix.map --script=fuzix.link \
+	$(CROSS_LD) \
+	--oformat=decb -o ../fuzix.bin -Map=../fuzix.map --script=fuzix.link \
 	crt0.o commonmem.o \
 	dfboard.o discard.o ../simple.o \
 	../start.o ../version.o ../lowlevel-6809.o \
@@ -53,7 +54,5 @@ image:
 	../syscall_proc.o ../syscall_other.o ../mm.o ../swap.o \
 	../tty.o ../devsys.o ../usermem.o ../syscall_fs2.o ../syscall_exec16.o \
 	devtty.o libc.o ../vt.o ../syscall_fs3.o
-	s19tobin <fuzix.s19 >../fuzix.bin
-	rm fuzix.s19
 
 .PHONY: all clean image

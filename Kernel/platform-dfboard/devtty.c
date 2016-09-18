@@ -20,8 +20,8 @@ struct s_queue ttyinq[NUM_DEV_TTY + 1] = {	/* ttyinq[0] is never used */
 /* Output for the system console (kprintf etc) */
 void kputchar(char c)
 {
-	if (c == '\n')
-		tty_putc(1, '\r');
+/*	if (c == '\n')
+		tty_putc(1, '\r');*/
 	tty_putc(1, c);
 }
 
@@ -36,7 +36,7 @@ void tty_putc(uint8_t minor, unsigned char c)
 {
 	if (minor != 1)
 		panic("tty_putc: minor != 1");
-	F_OUTCHAR(c);
+	BOOT_OUTCHAR(c);
 }
 
 void tty_sleeping(uint8_t minor)
