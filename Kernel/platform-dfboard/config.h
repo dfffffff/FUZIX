@@ -12,9 +12,9 @@
 /* The tty is a spi display */
 //#define CONFIG_SPI_DISPLAY
 /* The tty software cursor character */
-//#define CONFIG_SOFT_CURSOR 0x12
-/* Soft cursor blink speed (pow of two) */
-//#define CONFIG_BLINK_SPEED 8
+//#define CONFIG_SOFT_CURSOR 0x1F
+/* Soft cursor blink speed (1-7, 0 always on) */
+//#define CONFIG_BLINK_SPEED 3
 
 /* Banks as reported to user space */
 #define CONFIG_BANKS 1

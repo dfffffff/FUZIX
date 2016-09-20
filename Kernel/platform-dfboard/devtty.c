@@ -11,7 +11,10 @@
 unsigned char tbuf1[TTYSIZ];
 unsigned char tbuf2[TTYSIZ];
 #ifdef CONFIG_SOFT_CURSOR
-static unsigned char count, disable;
+static unsigned char disable;
+#if CONFIG_BLINK_SPEED > 0
+static unsigned char count;
+#endif
 #endif
 
 struct s_queue ttyinq[NUM_DEV_TTY + 1] = {	/* ttyinq[0] is never used */
@@ -78,12 +81,14 @@ bool tty_caninsert(uint8_t minor)
 }
 
 #ifdef CONFIG_SOFT_CURSOR
+#if CONFIG_BLINK_SPEED > 0
+
 void tty_cursor(void)
 {
 	if (!disable) {
 		count++;
-		if (!(count & ((CONFIG_BLINK_SPEED)-1))) {
-			if (count & (CONFIG_BLINK_SPEED))
+		if (!(count & ((1<<(CONFIG_BLINK_SPEED))-1))) {
+			if (count & (1<<(CONFIG_BLINK_SPEED)))
 				BOOT_OUTCHAR(CONFIG_SOFT_CURSOR);
 			else
 				BOOT_OUTCHAR(' ');
@@ -96,7 +101,7 @@ void tty_outchar(unsigned char chr)
 {
 	uint8_t cc = di();
 	if (!disable) {
-		if (count & (CONFIG_BLINK_SPEED)) {
+		if (count & (1<<(CONFIG_BLINK_SPEED))) {
 			count = 0;
 			BOOT_OUTCHAR(' ');
 			BOOT_OUTCHAR('\b');
@@ -111,4 +116,29 @@ void tty_outchar(unsigned char chr)
 	BOOT_OUTCHAR(chr);
 	irqrestore(cc);
 }
+
+#else
+
+void tty_outchar(unsigned char chr)
+{
+	if (!disable) {
+		if (chr < ' ') {
+			BOOT_OUTCHAR(' ');
+			BOOT_OUTCHAR('\b');
+		}
+		if (chr == '\r')
+			disable = 1;
+	}
+	else {
+		if (chr == '\n')
+			disable = 0;
+	}
+	BOOT_OUTCHAR(chr);
+	if (!disable) {
+		BOOT_OUTCHAR(CONFIG_SOFT_CURSOR);
+		BOOT_OUTCHAR('\b');
+	}
+}
+
+#endif
 #endif

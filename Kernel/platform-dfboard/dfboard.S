@@ -35,7 +35,7 @@
 	.globl	_timer_interrupt
 	.globl	_tty_inproc
 	.globl	_tty_caninsert
-#ifdef CONFIG_SOFT_CURSOR
+#if defined(CONFIG_SOFT_CURSOR) && CONFIG_BLINK_SPEED > 0
 	.globl	_tty_cursor
 #endif
 
@@ -158,7 +158,7 @@ _timercheck:
 	bpl	tcend
 	ldb	BOOT.PTM_TC3
 	jsr	_timer_interrupt
-#ifdef CONFIG_SOFT_CURSOR
+#if defined(CONFIG_SOFT_CURSOR) && CONFIG_BLINK_SPEED > 0
 	jsr	_tty_cursor
 #endif
 tcend:	rts
