@@ -10,7 +10,11 @@
 #undef CONFIG_SINGLETASK
 
 /* The tty is a spi display */
-#undef CONFIG_SPIDISPLAY
+//#define CONFIG_SPI_DISPLAY
+/* The tty software cursor character */
+//#define CONFIG_SOFT_CURSOR 0x12
+/* Soft cursor blink speed (pow of two) */
+//#define CONFIG_BLINK_SPEED 8
 
 /* Banks as reported to user space */
 #define CONFIG_BANKS 1
@@ -20,8 +24,8 @@
 #define CONFIG_SPLIT_UDATA
 #define CONFIG_USERMEM_DIRECT
 
-#ifdef CONFIG_SPIDISPLAY
-#define PTABSIZE    14          /* Max processes */
+#ifdef CONFIG_SPI_DISPLAY
+#define PTABSIZE    10         /* Max processes */
 #else
 #define PTABSIZE    20         /* Max processes */
 #endif

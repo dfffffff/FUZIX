@@ -35,13 +35,16 @@
 	.globl	_timer_interrupt
 	.globl	_tty_inproc
 	.globl	_tty_caninsert
+#ifdef CONFIG_SOFT_CURSOR
+	.globl	_tty_cursor
+#endif
 
 #define INCLUDE_LIB_BOOT
 #include "boot.h"
 #include "config.h"
 #include "kernel.def"
 #include "../kernel09.def"
-#ifdef CONFIG_SPIDISPLAY
+#ifdef CONFIG_SPI_DISPLAY
 	.area	.text
 	lib	<io2/spi.i09>
 	lib	<lcd/SSD1306_devs.i09>
@@ -64,7 +67,7 @@
 	.area	.discard
 
 init_early:
-#ifdef CONFIG_SPIDISPLAY
+#ifdef CONFIG_SPI_DISPLAY
 	ldd	#(SSD1306.F_FAST|SSD1306.F_HW)*$100|1
 	jsr	SSD1306.INIT
 	ldx	#SSD1306.DISPCHR
@@ -155,6 +158,9 @@ _timercheck:
 	bpl	tcend
 	ldb	BOOT.PTM_TC3
 	jsr	_timer_interrupt
+#ifdef CONFIG_SOFT_CURSOR
+	jsr	_tty_cursor
+#endif
 tcend:	rts
 
 ;extern bool tty_caninsert(uint8_t minor);

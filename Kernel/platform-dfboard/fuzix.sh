@@ -1,2 +1,2 @@
 #!/bin/sh
-exec boardio TRY Z L -VS fuzix.bin TTY
+exec boardio TRY Z L -VFS fuzix.bin TTY
