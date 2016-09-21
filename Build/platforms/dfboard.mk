@@ -137,6 +137,7 @@ FILESYSTEM = \
 	/bin/diff               0755 $(v7-cmd-diff.result) \
 	/bin/diff3              0755 $(v7-cmd-diff3.result) \
 	/bin/diffh              0755 $(v7-cmd-diffh.result) \
+	/bin/ed                 0755 $(v7-cmd-ed.result) \
 	/bin/join               0755 $(v7-cmd-join.result) \
 	/bin/makekey            0755 $(v7-cmd-makekey.result) \
 	/bin/mesg               0755 $(v7-cmd-mesg.result) \
