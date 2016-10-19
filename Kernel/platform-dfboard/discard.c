@@ -18,7 +18,14 @@ void map_init(void)
 	if (system_id > SYSNAME_MAX)
 		system_id = SYSNAME_MAX;
 
+#ifdef CONFIG_SHOW_MHZ
+	char buffer[16];
+	extern char *compute_mhz(char *buffer);
+	kprintf("%s system running on %u MPU at ", sysname[system_id], mpu_id, buffer);
+	kprintf("%s MHz.\n", compute_mhz(buffer));
+#else
 	kprintf("%s system running on %u MPU.\n", sysname[system_id], mpu_id);
+#endif
 
 	/* We put swap on the start of slice 1 */
 	for (i = 0; i < MAX_SWAPS; i++)

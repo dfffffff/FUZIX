@@ -38,7 +38,10 @@ int main(void)
 
 	setenv(BOARDIO_ENV_DEVICE, "/dev/boardio2", 1);
 	setenv(BOARDIO_ENV_RTSCTS, "2", 1);
-	setenv(BOARDIO_ENV_SPEED,  "1000000", 1);
+	setenv(BOARDIO_ENV_SPEED,  "1000000", 1); /* 16 MHz */
+//	setenv(BOARDIO_ENV_SPEED,  "921600", 1); /* 14.7456 MHz */
+//	setenv(BOARDIO_ENV_SPEED,  "750000", 1); /* 12 MHz */
+//	setenv(BOARDIO_ENV_SPEED,  "500000", 1); /* 8 MHz */
 	setenv(BOARDIO_ENV_STOPB,  "1", 1);
 	setenv(BOARDIO_ENV_SYNC,   "0", 1);
 

@@ -16,6 +16,9 @@
 /* Soft cursor blink speed (1-7, 0 always on) */
 //#define CONFIG_BLINK_SPEED 3
 
+/* Show processor speed */
+//#define CONFIG_SHOW_MHZ 1
+
 /* Banks as reported to user space */
 #define CONFIG_BANKS 1
 
@@ -36,6 +39,7 @@
 #define SWAPBASE    0x8000     /* We swap the lot, excluding stashed uarea */
 #define SWAPTOP     0xFA00     /* so it's a round number of 512 byte sectors */
 #define UDATA_SIZE  0x0200     /* one block */
+#define UDATA_BLKS  1
 #define MAX_SWAPS   PTABSIZE
 #define swap_map(x) ((uint8_t *)(x))
 

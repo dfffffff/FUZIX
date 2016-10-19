@@ -107,6 +107,19 @@ init_hardware:
 fast:	std	BOOT.PTM_MBR3
 	rts
 
+#ifdef CONFIG_SHOW_MHZ
+		lib	<io2/pc16550d.i09>
+		.globl	FREQ,FREQ.EOT,FREQ.PORT_ADDR,FREQ.PORT_BIT
+		.globl	FREQ.CLK_FREQ,FREQ.ADJ_VALUE,_compute_mhz
+FREQ.EOT	equ	0
+FREQ.PORT_ADDR	equ	PC16550D.MSR
+FREQ.PORT_BIT	equ	PC16550D.RI
+FREQ.CLK_FREQ	equ	15625		; = 32000000/1/2^(10+1)
+FREQ.ADJ_VALUE	equ	0
+FREQ		lib	<misc/freq/frequency.i09>
+_compute_mhz	equ	FREQ
+#endif
+
 
 ;
 ; COMMON MEMORY PROCEDURES FOLLOW
