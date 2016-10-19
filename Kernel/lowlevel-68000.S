@@ -384,6 +384,7 @@ SYM (__umodsi3):
 		.globl trace,unimpa,unimpf,misctrap,trap15,trap14,sysc_err
 		.globl spurious,unexpected,uninit
 		.globl udata_shadow
+		.globl signal_helper
 
 .mri 1
 get_usp:	move.l	usp,a0
@@ -414,15 +415,21 @@ irqrestore:
 		move.w d0,sr
 		rts
 
+;
+;	Put the supervisor stack back as if we had nothing on it (we just
+;	longjmp'd out of the syscall path really). Then we push an exception
+;	frame, clear the registers and rte. We need to rte as we want to
+;	switch modes as we switch address so that we don't fault if there
+;	is memory protection.
+;
 doexec:
-		;
-		;	FIXME: we need to reset sp (we effectively longjmp
-		; 	in supervisor space), then push the values. If we
-		;	don't then the supervisor stack will go awry
-		;
-		move.l (sp)+,a0			; throw the return address
+		move.l 4(sp),a1			; go address
+		lea.l 1024(a5),a7		; reset the supervisor stack
+
+		and.w #$F8FF,sr			; IRQ on
+		move.l a1,-(sp)			; return address
 		clr.w -(sp)			; set up the status register
-		move.l U_DATA__U_ISP,a0
+		move.l U_DATA__U_ISP(a5),a0
 		move.l a0,usp			; set the user stack
 		moveq #0,d0			; wipe the registers
 		move.l d0,d1
@@ -466,23 +473,102 @@ misctrap:	move.w #SIGILL,-(sp)
 		bra sig_or_die
 trap15:		move.w #SIGTRAP,-(sp)			; by convention
 		bra sig_or_die
-trap14:		movem.l a2-a6/d2-d7,-(sp)
+
+;
+;		Save as little as we can
+;		a0/a1 we are allowed to trash
+;		d0/d1 are our returns
+;		a5 we save, but otherwise we leave it to C to do needed
+;		saves only
+;
+trap14:		move.l a5,-(sp)
+		move.l udata_shadow,a5
+		move.b d0,U_DATA__U_CALLNO(a5)
+		move.l usp,a0
+		move.l a0,U_DATA__U_SYSCALL_SP(a5)
+		move.b #1,U_DATA__U_INSYS(a5)
+		move.l 4(a0),U_DATA__U_ARGN(a5)
+		move.l 8(a0),U_DATA__U_ARGN1(a5)
+		move.l 12(a0),U_DATA__U_ARGN2(a5)
+		move.l 16(a0),U_DATA__U_ARGN3(a5)
 		move.b #1,d0
 		move.b d0,kernel_flag
 		; FIXME: EI per platform really
 		and.w #$F8FF,sr
-		move.l udata_shadow,a5
 		bsr unix_syscall
-		; FIXME: signal handling in the C code or not ?
 	        or.w #$0700,sr
-		move.w U_DATA__U_ERROR,d1
+		clr.b U_DATA__U_INSYS(a5)
+		; Now we need to be careful. We can make a syscall in a
+		; signal handler and we must not screw up the return from
+		; this call
+		move.w U_DATA__U_ERROR(a5),d1
 		bne sysc_err
-		move.w U_DATA__U_RETVAL,d0
-		movem.l (sp)+,a2-a6/d2-d7
+		move.l U_DATA__U_RETVAL(a5),d0
+		; return data is now safe
+sysc_sig:
+		tst.b U_DATA__U_CURSIG(a5)
+		bne return_via_signal
+		; no signal - normal path
+		move.l d0,a0		; need to set a0, so set to d0
+					; avoids syscalls having to do it
+					; for pointer returns
+		move.l d0,a1		; no leakage please
+		move.l (sp)+,a5
 		rte
-sysc_err:	move.w #-1,d0
-		movem.l (sp)+,a2-a6/d2-d7
-		rte
+sysc_err:	moveq #-1,d0
+		bra sysc_sig
+;
+;		Signal handler return path
+;
+return_via_signal:
+		move.l usp,a0
+		subq #6,a0			; make a space for the
+						; return and ccr
+;
+;	This looks weird but think about it. We've executed trap #foo
+; 	so our A0/A1 are some caller destroyed value we don't care about (
+;	and will be D0 on a normal trap return). Thus if we make the signal
+;	handler also restore D0 all is fine. The IRQ path uses signal_helper
+;	below because it does have to stack the true a1/a0/d1/d0
+;
+		move.l d0,-(a0)			; old A1
+		move.l d0,-(a0)			; old A0 (= D0)
+		movem.l d0/d1,-(a0)		; stack ret/errno
+
+signal_helper:
+
+		;
+		;	Now arrange to return via the signal handler
+		;
+		lea U_DATA__U_SIGVEC(a5),a0
+		move.b U_DATA__U_CURSIG(a5),d0
+		clr.b U_DATA__U_CURSIG(a5)
+		; Good for 64 signals..
+		add.b d0,d0
+		add.b d0,d0
+		ext.w d0
+		add.w d0,a0
+		move.l U_DATA__U_CODEBASE(a5),a1
+		add #64,a1			; _sigunwind
+		move.l (sp)+,a5
+		move.w (sp)+,d0			; status word
+		; We don't actually need to copy the CCR except for IRQ
+		move.w d0,16(a0)		; CCR to recover
+		move.l (sp)+,d0			; return address
+		move.l d0,18(a0)		; into user stack
+
+		move.l a0,usp			; set user stack pointer
+		;
+		;	New exception frame. FIXME set program base
+		;	correctly !!!
+		;
+		move.l a1,-(sp)			; _sigunwind
+		clr.w -(sp)			; status
+		moveq #0,d0
+		moveq #0,d1
+		move.l d0,a0
+		move.l d0,a1
+		rte				; exit trap handler
 
 spurious:	movem.l a0-a6/d0-d7,-(sp)
 		move.l #strspurious,a0
@@ -552,24 +638,33 @@ intvector7:	movem.l a0-a6/d0-d7,-(sp)
 sig_or_die:	
 		tst.b kernel_flag
 		beq sig_user
-		move.b (sp),d0
+		move.w (sp)+,d0
 		bsr outcharhex
 		lea panic_sig,a0
 		bsr outstring
-		lea panic_sig2,a0
+		move.w #15,d2
+stackout:
+		move.l (sp)+,a0
+		bsr outa0hex
+		lea crnl,a0
+		bsr outstring
+		dbra d2,stackout
+		move.l #panic_sig2,-(sp)
 		bsr panic			; won't return
 panic_sig:	ascii ": signal in kernel mode."
-		byte 13,10
-panic_sig2:	asciz ": ksig"
+crnl:
+		byte 13,10,0
+panic_sig2:	asciz "ksig"
 		.align 2
 
-sig_user:	movem.l a0-a6/d0-d7,-(sp)
+sig_user:	movem.l a0-a1/a5/d0-d1,-(sp)
 	        move.l udata_shadow,a5
 		move.l U_DATA__U_PTAB(a5),-(sp)
 		bsr ssig
 		adda #4,sp
 		; Do signal processing bit here if we return
-		movem.l (sp)+,a0-a6/d0-d7
+		movem.l (sp)+,a0-a1/a5/d0-d1
+		adda #4,sp
 		rte
 
 ;
