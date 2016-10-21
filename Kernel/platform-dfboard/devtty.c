@@ -43,6 +43,11 @@ void tty_putc(uint8_t minor, unsigned char c)
 #ifdef CONFIG_SOFT_CURSOR
 	tty_outchar(c);
 #else
+#ifdef CONFIG_IDE_ON_TTY
+	/* strip null character */
+	if (c == 0)
+		return;
+#endif
 	BOOT_OUTCHAR(c);
 #endif
 }

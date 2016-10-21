@@ -16,6 +16,9 @@
 /* Soft cursor blink speed (1-7, 0 always on) */
 //#define CONFIG_BLINK_SPEED 3
 
+/* The IDE is on the kernel TTY */
+#define CONFIG_IDE_ON_TTY 1
+
 /* Show processor speed */
 //#define CONFIG_SHOW_MHZ 1
 

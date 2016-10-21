@@ -70,6 +70,10 @@ init_early:
 #ifdef CONFIG_SPI_DISPLAY
 	ldd	#(SSD1306.F_FAST|SSD1306.F_HW)*$100|1
 	jsr	SSD1306.INIT
+#ifdef CONFIG_IDE_ON_TTY
+	ldx	BOOT.TF_OUTCHAR
+	stx	prev_outchar
+#endif
 	ldx	#SSD1306.DISPCHR
 	stx	BOOT.TF_OUTCHAR
 #endif
@@ -222,6 +226,7 @@ outchar:
 ;
 ;	__outchar and __inchar are used for external storage access
 ;
+#ifndef CONFIG_IDE_ON_TTY
 __outchar:
 	lda	BOOT.ACIA_SR
 	bita	#BOOT.ACIA_SR_FE|BOOT.ACIA_SR_OVRN|BOOT.ACIA_SR_PE
@@ -243,12 +248,30 @@ __inchar:
 aciaerr:
 	ldb	#-6
 	jmp	BOOT.F_ERROR
+#else
+
+__outchar:
+#ifdef CONFIG_SPI_DISPLAY
+	jmp	[prev_outchar]
+#else
+	jmp	[BOOT.TF_OUTCHAR]
+#endif
+
+__inchar:
+	jmp	[BOOT.TF_INCHAR]
+
+#endif
 
 
 	.area	.common
 
 _need_resched:
 	.db	0
+
+#ifdef CONFIG_IDE_ON_TTY
+prev_outchar:
+	.dw	0
+#endif
 
 ; make sure the kernel space finish before user space
 	.area	.end_of_kernel
