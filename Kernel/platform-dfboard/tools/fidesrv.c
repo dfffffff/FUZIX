@@ -58,11 +58,12 @@ int open_tty(void)
 			newt.c_lflag |= ISIG;
 			if (!tcsetattr(newtty, TCSANOW, &newt)) {
 				tty = newtty;
-				return 1;
+				return newtty;
 			}
 		}
+		close(newtty);
 	}
-	return 0;
+	return -1;
 }
 #endif
 
@@ -98,7 +99,7 @@ void openimg(void)
 	}
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	unsigned char cmd, sector[512];
 	unsigned int addr;
@@ -106,7 +107,7 @@ int main(void)
 #ifdef CONFIG_IDE_ON_TTY
 	char chr;
 	fd_set fdset;
-	int boardfd, stdinfd, ret, nfds;
+	int boardfd, ttyfd, ret, nfds;
 #endif
 
 #ifndef CONFIG_IDE_ON_TTY
@@ -129,34 +130,39 @@ int main(void)
 		fatal(2);
 
 #ifdef CONFIG_IDE_ON_TTY
-	if (!boardio_reset())
-		fatal(3);
+	if (!(argc == 2 && !strcmp(argv[1], "--resume")))
+	{
+		if (!boardio_reset())
+			fatal(3);
 
 #ifdef FAST
-	chr = 0xF8;
-	if (!boardio_writemem(0xFF80, 1, &chr))
-		fatal(4);
+		chr = 0xF8;
+		if (!boardio_writemem(0xFF80, 1, &chr))
+			fatal(4);
 #endif
 #ifdef SLOW
-	chr = 0xD8;
-	if (!boardio_writemem(0xFF80, 1, &chr))
-		fatal(4);
+		chr = 0xD8;
+		if (!boardio_writemem(0xFF80, 1, &chr))
+			fatal(4);
 #endif
 
-	if (!boardio_load(FUSIX_IMAGE, BOARDIO_EXEC, NULL))
-		fatal(5);
+		if (!boardio_load(FUSIX_IMAGE, BOARDIO_EXEC, NULL))
+			fatal(5);
+	}
+	else
+		openimg();
 
 	boardfd = boardio_getfd(BOARDIO_GETFD_DAT);
 	if (boardfd == -1)
 		fatal(6);
 
-	if (!open_tty())
+	ttyfd = open_tty();
+	if (ttyfd == -1)
 		fatal(7);
 
-	stdinfd = tty;
 	nfds = boardfd;
-	if (stdinfd > nfds)
-		nfds = stdinfd;
+	if (ttyfd > nfds)
+		nfds = ttyfd;
 	nfds++;
 	FD_ZERO(&fdset);
 #endif
@@ -164,7 +170,7 @@ int main(void)
 	for (;;) {
 #ifdef CONFIG_IDE_ON_TTY
 		FD_SET(boardfd, &fdset);
-		FD_SET(stdinfd, &fdset);
+		FD_SET(ttyfd, &fdset);
 		ret = select(nfds, &fdset, NULL, NULL, NULL);
 		if (ret == -1)
 			fatal(8);
@@ -177,14 +183,14 @@ int main(void)
 					fatal(10);
 			}
 			else {
-				ret = write(tty, &cmd, 1);
+				ret = write(ttyfd, &cmd, 1);
 				if (ret != 1)
 					fatal(11);
 				continue;
 			}
 		}
-		else if (FD_ISSET(stdinfd, &fdset)) {
-			ret = read(stdinfd, &chr, 1);
+		else if (FD_ISSET(ttyfd, &fdset)) {
+			ret = read(ttyfd, &chr, 1);
 			if (ret != 1)
 				fatal(12);
 			/* strip null char */
