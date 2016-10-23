@@ -118,8 +118,8 @@ fast:	std	BOOT.PTM_MBR3
 FREQ.EOT	equ	0
 FREQ.PORT_ADDR	equ	PC16550D.MSR
 FREQ.PORT_BIT	equ	PC16550D.RI
-FREQ.CLK_FREQ	equ	15625		; = 32000000/1/2^(10+1)
-FREQ.ADJ_VALUE	equ	0
+FREQ.CLK_FREQ	equ	15625	; = 32000000/2048
+FREQ.ADJ_VALUE	equ	-46
 FREQ		lib	<misc/freq/frequency.i09>
 _compute_mhz	equ	FREQ
 #endif
