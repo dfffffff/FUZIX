@@ -31,7 +31,7 @@
 #define CONFIG_USERMEM_DIRECT
 
 #ifdef CONFIG_SPI_DISPLAY
-#define PTABSIZE    10         /* Max processes */
+#define PTABSIZE    9          /* Max processes */
 #else
 #define PTABSIZE    20         /* Max processes */
 #endif

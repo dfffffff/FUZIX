@@ -39,6 +39,7 @@ include $(TOP)/Library/tests/build.mk
 include $(TOP)/Applications/build.mk
 include $(TOP)/Applications/V7/cmd/sh/build.mk
 include $(TOP)/Applications/levee/build.mk
+include $(TOP)/Applications/ue/build.mk
 include $(TOP)/Standalone/filesystem-src/build.mk
 
 ifeq ($(wildcard $(TOP)/Kernel/platform-$(PLATFORM)/build.mk),)

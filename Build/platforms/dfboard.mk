@@ -157,6 +157,7 @@ FILESYSTEM = \
 	/usr/games/fish         0755 $(v7-games-fish.result) \
 	/usr/games/wump         0755 $(v7-games-wump.result) \
 	/bin/sh                 0755 $(v7-sh.result) \
+	/bin/ue                 0755 $(ue.result) \
 
 # These don't work yet. \
 	/bin/accton             0755 $(Applications/V7/cmd/accton.result) \
