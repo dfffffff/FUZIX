@@ -1,31 +1,29 @@
 /* Keep these in sync with struct u_data!! */
 
 #define U_DATA__U_PTAB		0
-#define U_DATA__U_PAGE		4
-#define U_DATA__U_PAGE2		6
-#define U_DATA__U_INSYS		8
-#define U_DATA__U_CALLNO	9
-#define U_DATA__U_SYSCALL_SP	10
-#define U_DATA__U_RETVAL	14
-#define U_DATA__U_ERROR		18
-#define U_DATA__U_SP		20
-#define U_DATA__U_ININTERRUPT	24
-#define U_DATA__U_CURSIG	25
-#define U_DATA__U_ARGN		26
-#define U_DATA__U_ARGN1		30
-#define U_DATA__U_ARGN2		34
-#define U_DATA__U_ARGN3		38
-#define U_DATA__U_ISP		42
-#define U_DATA__U_TOP		46
-#define U_DATA__U_BREAK		50
-#define U_DATA__U_CODEBASE	54
-#define U_DATA__U_SIGVEC	58
+#define U_DATA__U_PAGE		2
+#define U_DATA__U_PAGE2		4
+#define U_DATA__U_INSYS		6
+#define U_DATA__U_CALLNO	7
+#define U_DATA__U_SYSCALL_SP	8
+#define U_DATA__U_RETVAL	10
+#define U_DATA__U_ERROR		12
+#define U_DATA__U_SP		14
+#define U_DATA__U_ININTERRUPT	16
+#define U_DATA__U_CURSIG	17
+#define U_DATA__U_ARGN		18
+#define U_DATA__U_ARGN1		20
+#define U_DATA__U_ARGN2		22
+#define U_DATA__U_ARGN3		24
+#define U_DATA__U_ISP		26
+#define U_DATA__U_TOP		28
+#define U_DATA__U_BREAK		30
+#define U_DATA__U_SIGVEC	32
 
 #define P_TAB__P_STATUS_OFFSET	0
 #define P_TAB__P_TTY_OFFSET	1
 #define P_TAB__P_PID_OFFSET	2
-#define P_TAB__P_PAGE_OFFSET	20
-#define P_TAB__P_UDATA_OFFSET	24
+#define P_TAB__P_PAGE_OFFSET	14
 
 #define P_RUNNING		1
 #define P_READY			2
