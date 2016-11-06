@@ -20,9 +20,9 @@
 	.globl	_procmem
 	.globl	_trap_monitor
 	.globl	_trap_reboot
-	.globl	_di
-	.globl	_ei
-	.globl	_irqrestore
+	.globl	___hard_di
+	.globl	___hard_ei
+	.globl	___hard_irqrestore
 	.globl	_timercheck
 	.globl	_keycheck
 	.globl	__outchar
@@ -143,16 +143,16 @@ _trap_monitor:
 	jmp	BOOT.F_ERROR	; throw an error for now, TODO
 
 
-_di:
+___hard_di:
 	tfr	cc,b		; return the old irq state
 	orcc	#$10
 	rts
 
-_ei:
+___hard_ei:
 	andcc	#$EF
 	rts
 
-_irqrestore:			; B holds the data
+___hard_irqrestore:		; B holds the data
 	tfr	b,cc
 	rts
 
