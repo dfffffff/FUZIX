@@ -11,6 +11,7 @@
 #include <dwtime.h>
 #include <netdev.h>
 
+
 struct devsw dev_tab[] =  /* The device driver switch table */
 {
 // minor    open         close        read      write       ioctl
@@ -48,7 +49,8 @@ void device_init(void)
 #ifdef CONFIG_COCOSDC
 	devsdc_init( );
 #endif
-	dwtime_init( );
+	if ( ! dw_init() )
+		dwtime_init( );
 	inittod();
 	sock_init();
 }
