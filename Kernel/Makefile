@@ -6,7 +6,7 @@ TARGET_LIST = platform-nc100 platform-micropack platform-pcw8256 platform-socz80
 #export TARGET = bbcmicro
 #export TARGET = dragon
 #export TARGET = coco2
-#export TARGET = coco2cart
+export TARGET = coco2cart
 #export TARGET = coco3
 export TARGET = dfboard
 #export TARGET = dragon-nx32
@@ -77,7 +77,7 @@ CDSRCS = start.c
 C1SRCS =  version.c filesys.c devio.c kdata.c
 C1SRCS += inode.c tty.c
 C2SRCS =  syscall_proc.c process.c malloc.c
-C2SRCS += simple.c single.c bank16k.c bank16k_low.c bank32k.c
+C2SRCS += simple.c single.c bank8k.c bank16k.c bank16k_low.c bank32k.c
 C2SRCS += bankfixed.c flat.c buddy.c
 #
 #	Usually we map sysalls into CODE2 but they can be overlaid

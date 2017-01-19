@@ -15,23 +15,27 @@
 
 #define CONFIG_BANKS	1
 /* And swapping */
-#define SWAPDEV     0x0		/* Uses part of IDE slice 0 */
+#define SWAPDEV     0x900      	/* Uses part of IDE slice 0 */
 #define SWAP_SIZE   0x40	/* 32K in 512 byte blocks */
-#define SWAPBASE    0x8000	/* We swap the lot, including stashed uarea */
+#define SWAPBASE    0x8000	/* We swap the lot */
 #define SWAPTOP     0xFE00	/* so it's a round number of 512 byte sectors */
 #define UDATA_SIZE  0x0200	/* one block */
 #define MAX_SWAPS   32
 
 /* Permit large I/O requests to bypass cache and go direct to userspace */
 #define CONFIG_LARGE_IO_DIRECT
+#define CONFIG_LEGACY_EXEC
 
 /* Video terminal, not a serial tty */
 #define CONFIG_VT
 #define CONFIG_FONT8X8
 #define CONFIG_FONT8X8SMALL
 
-extern unsigned char vt_mangle_6847(unsigned char c);
-#define VT_MAP_CHAR(x)	vt_mangle_6847(x)
+/* We can reclaim discard into buffers */
+#define CONFIG_DYNAMIC_BUFPOOL
+
+/* Allow for our swap heavy nature */
+#define MAXTICKS 25
 
 /* Vt definitions */
 #define VT_WIDTH	32
@@ -45,7 +49,7 @@ extern unsigned char vt_mangle_6847(unsigned char c);
 #define TICKSPERSEC 50   /* Ticks per second */
 #define PROGBASE    0x8000  /* also data base */
 #define PROGLOAD    0x8000  /* also data base */
-#define PROGTOP     0xF000  /* Top of program */
+#define PROGTOP     0xFE00  /* Top of program */
 
 /* We need a tidier way to do this from the loader */
 #define CMDLINE	NULL	  /* Location of root dev name */
