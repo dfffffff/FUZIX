@@ -1,0 +1,14 @@
+.PHONY: all clean run
+
+all:
+	$(MAKE) -C Kernel TARGET=dfboard
+	$(MAKE) PLATFORM=dfboard
+	$(MAKE) -C Kernel/platform-dfboard/tools
+
+clean:
+	rm -rf .obj/ filesystem-dfboard.img
+	$(MAKE) -C Kernel TARGET=dfboard clean
+	$(MAKE) -C Kernel/platform-dfboard/tools clean
+
+run: Kernel/platform-dfboard/tools/fidesrv
+	$<
